@@ -1,0 +1,14 @@
+material vr_localization/tag4
+{
+ technique
+ {
+   pass
+   {
+     texture_unit
+     {
+       texture ../textures/AR_tag4.png
+       scale 1 1
+     }
+   }
+ }
+}
