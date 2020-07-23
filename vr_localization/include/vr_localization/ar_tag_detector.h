@@ -20,6 +20,10 @@ class ARTagDetector
 public:
     ARTagDetector() {};
     std::vector<ARTag> DetectTags(const cv::Mat& img);
+private:
+    cv::Mat unionFind(const cv::Mat& bin_img);
+    void boundarySegmentation(const cv::Mat& img);
+    std::vector<cv::Point2i> lineDetection();
 };
 
 #endif // !AR_TAG_DETECTOR__
