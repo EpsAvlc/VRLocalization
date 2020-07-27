@@ -25,9 +25,14 @@ public:
     ARTagDetector() {};
     std::vector<ARTag> DetectTags(const cv::Mat& img);
 private:
-    cv::Mat unionFind(const cv::Mat& bin_img);
+    /* big function */
     std::unordered_map<uint32_t, std::vector<cv::Point2f>>  boundarySegmentation(const cv::Mat& img);
     std::vector<std::vector<cv::Point2f>> fittingQuads(std::unordered_map<uint32_t, std::vector<cv::Point2f>>& segments);
+
+    /* tool function */
+    cv::Mat unionFind(const cv::Mat& bin_img);
+    std::vector<std::vector<int>> getPermutations(const std::vector<int>& indices);
+    float fitLineAndComputeMSE(const cv::Mat& pts_mat);
 };
 
 #endif // !AR_TAG_DETECTOR__
