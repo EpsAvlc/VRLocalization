@@ -20,13 +20,17 @@ using namespace cv;
 
 vector<ARTag> ARTagDetector::DetectTags(const cv::Mat& img)
 {
-    Mat grad_dir, grad_mag;
-    unordered_map<uint32_t, vector<Point2f>> segments = boundarySegmentation(img);
-    fittingQuads(segments);
+    Mat bin_img = autoThreshold(img);
+    unordered_map<uint32_t, vector<Point2f>> segments = boundarySegmentation(bin_img);
+    auto quads = fittingQuads(segments);
+    for(int i = 0; i < quads.size(); i ++)
+    {
+        uint16_t code = decoding(bin_img, quads[i]);
+    }
     return vector<ARTag>();
 }
 
-unordered_map<uint32_t, vector<Point2f>> ARTagDetector::boundarySegmentation(const cv::Mat& img)
+Mat ARTagDetector::autoThreshold(const cv::Mat& img)
 {
     Mat gray_img;
     if(img.channels() == 3)
@@ -43,6 +47,12 @@ unordered_map<uint32_t, vector<Point2f>> ARTagDetector::boundarySegmentation(con
     }
     Mat bin_img;
     threshold(gray_img, bin_img, -1, 255, THRESH_BINARY | THRESH_OTSU);
+    return move(bin_img);
+}
+
+unordered_map<uint32_t, vector<Point2f>> ARTagDetector::boundarySegmentation(const cv::Mat& bin_img)
+{
+
     Mat uf = unionFind(bin_img);
 
     unordered_map<uint32_t, vector<Point2f>> segments;
@@ -130,18 +140,6 @@ vector<vector<Point2f>> ARTagDetector::fittingQuads(unordered_map<uint32_t, vect
         );
     }  
     Mat disp_seg(480, 640, CV_8UC1, Scalar(0));
-    // for(auto & seg: segments)
-    // {
-    //     for(int i = 0; i < seg.second.size(); i++)
-    //     {
-    //         // disp_seg.at<uchar>(seg.second[i]) = 255;
-    //         circle(disp_seg, seg.second[i], 2, 255, -1);
-    //         imshow("disp_seg", disp_seg);
-    //         moveWindow("disp_seg", 200, 700);
-    //         waitKey(10);
-    //         cout << seg.first << endl;
-    //     }
-    // }
     
     Mat cor_disp(480, 640, CV_8UC1, Scalar(0));
     vector<vector<Point2f>> res;
@@ -291,6 +289,128 @@ vector<vector<Point2f>> ARTagDetector::fittingQuads(unordered_map<uint32_t, vect
     imshow("disp_cor", cor_disp);
     moveWindow("disp_cor", 200, 700);
     return std::move(res);
+}
+
+uint16_t ARTagDetector::decoding(const cv::Mat& img, const vector<Point2f>& corners)
+{
+    vector<Point2f> target_pts(4);
+    target_pts[0] = Point2f(0, 0);
+    target_pts[1] = Point2f(100, 0);
+    target_pts[2] = Point2f(100, 100);
+    target_pts[3] = Point2f(0, 100);
+
+    Mat affineTransform = getPerspectiveTransform(corners, target_pts);
+    Mat marker;
+    warpPerspective(img, marker, affineTransform, Size(100, 100));
+    marker = marker(Range(14, 86), Range(14, 86));
+    resize(marker, marker, Size(100, 100));
+    
+    uint16_t code = 0;
+    vector<pair<Point2f, Point2f>> lines;
+    Point2i start_point, end_point;
+
+    start_point.x = 0;
+    start_point.y = 50;
+    end_point.x = 100;
+    end_point.y = 50;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 50;
+    start_point.y = 0;
+    end_point.x = 50;
+    end_point.y = 100;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 0;
+    start_point.y = 0;
+    end_point.x = 100;
+    end_point.y = 100;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 100;
+    start_point.y = 0;
+    end_point.x = 0;
+    end_point.y = 100;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 50;
+    start_point.y = 0;
+    end_point.x = 50;
+    end_point.y = 50;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 100;
+    start_point.y = 50;
+    end_point.x = 50;
+    end_point.y = 50;
+    lines.push_back(make_pair(start_point, end_point));
+    
+    start_point.x = 50;
+    start_point.y = 100;
+    end_point.x = 50;
+    end_point.y = 50;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 0;
+    start_point.y = 50;
+    end_point.x = 50;
+    end_point.y = 50;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 0;
+    start_point.y = 0;
+    end_point.x = 50;
+    end_point.y = 50;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 100;
+    start_point.y = 0;
+    end_point.x = 50;
+    end_point.y = 50;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 100;
+    start_point.y = 100;
+    end_point.x = 50;
+    end_point.y = 50;
+    lines.push_back(make_pair(start_point, end_point));
+
+    start_point.x = 0;
+    start_point.y = 100;
+    end_point.x = 50;
+    end_point.y = 50;
+    lines.push_back(make_pair(start_point, end_point));
+
+    for(int i = 0; i < lines.size(); i++)
+    {
+        Mat line_mat(Size(100, 100), CV_8UC1, Scalar(0));
+        line(line_mat, lines[i].first, lines[i].second, Scalar(255), 1);
+        imshow("line_mat", line_mat);
+        Mat and_mat;
+        bitwise_and(marker, line_mat, and_mat);
+
+        int non_zero_count = countNonZero(and_mat);
+        Point2f& start_pt = lines[i].first;
+        Point2f& end_pt = lines[i].second;
+        int length = i < 4 ? 100 : 50;
+        if(non_zero_count >= length / 4 * 3)
+        {
+            code += 1 << i;
+            cout << "response" << endl;
+            cout << code << endl;
+        }
+
+        imshow("and_mat", and_mat);
+        imshow("marker", marker);
+        moveWindow("marker", 200, 900);
+        moveWindow("line_mat", 300, 700);
+        moveWindow("and_mat", 400, 1100);
+        cout << "Non zero count: " << non_zero_count << endl;
+        cout << "length: " << length << endl;
+        waitKey(0);
+    }
+
+    return code;
 }
 
 Mat ARTagDetector::unionFind(const cv::Mat& bin_img)

@@ -26,8 +26,10 @@ public:
     std::vector<ARTag> DetectTags(const cv::Mat& img);
 private:
     /* big function */
+    cv::Mat autoThreshold(const cv::Mat& img);
     std::unordered_map<uint32_t, std::vector<cv::Point2f>>  boundarySegmentation(const cv::Mat& img);
     std::vector<std::vector<cv::Point2f>> fittingQuads(std::unordered_map<uint32_t, std::vector<cv::Point2f>>& segments);
+    uint16_t decoding(const cv::Mat& img, const std::vector<cv::Point2f>& corners);
 
     /* tool function */
     cv::Mat unionFind(const cv::Mat& bin_img);
