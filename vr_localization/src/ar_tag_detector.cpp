@@ -393,20 +393,20 @@ uint16_t ARTagDetector::decoding(const cv::Mat& img, const vector<Point2f>& corn
         Point2f& start_pt = lines[i].first;
         Point2f& end_pt = lines[i].second;
         int length = i < 4 ? 100 : 50;
-        if(non_zero_count >= length / 4 * 3)
-        {
-            code += 1 << i;
-            cout << "response" << endl;
-            cout << code << endl;
-        }
+        // if(non_zero_count >= length / 4 * 3)
+        // {
+        //     code += 1 << i;
+        //     cout << "response" << endl;
+        //     cout << code << endl;
+        // }
 
-        imshow("and_mat", and_mat);
-        imshow("marker", marker);
-        moveWindow("marker", 200, 900);
-        moveWindow("line_mat", 300, 700);
-        moveWindow("and_mat", 400, 1100);
-        cout << "Non zero count: " << non_zero_count << endl;
-        cout << "length: " << length << endl;
+        // imshow("and_mat", and_mat);
+        // imshow("marker", marker);
+        // moveWindow("marker", 200, 900);
+        // moveWindow("line_mat", 300, 700);
+        // moveWindow("and_mat", 400, 1100);
+        // cout << "Non zero count: " << non_zero_count << endl;
+        // cout << "length: " << length << endl;
         waitKey(0);
     }
 

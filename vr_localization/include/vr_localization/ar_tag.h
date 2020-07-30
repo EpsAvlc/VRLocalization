@@ -10,6 +10,7 @@
 class ARTag
 {
 public:
+    uint16_t & code() {return code_;}
 private:
-    
+    uint16_t & code_;
 };
