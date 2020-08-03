@@ -26,6 +26,7 @@ vector<ARTag> ARTagDetector::DetectTags(const cv::Mat& img)
     for(int i = 0; i < quads.size(); i ++)
     {
         uint16_t code = decoding(bin_img, quads[i]);
+        
     }
     return vector<ARTag>();
 }
@@ -309,72 +310,84 @@ uint16_t ARTagDetector::decoding(const cv::Mat& img, const vector<Point2f>& corn
     vector<pair<Point2f, Point2f>> lines;
     Point2i start_point, end_point;
 
+    // ||
     start_point.x = 0;
     start_point.y = 50;
     end_point.x = 100;
     end_point.y = 50;
     lines.push_back(make_pair(start_point, end_point));
 
+    // --
     start_point.x = 50;
     start_point.y = 0;
     end_point.x = 50;
     end_point.y = 100;
     lines.push_back(make_pair(start_point, end_point));
 
+    // left up -> right down 
     start_point.x = 0;
     start_point.y = 0;
     end_point.x = 100;
     end_point.y = 100;
     lines.push_back(make_pair(start_point, end_point));
 
+    // left down -> right up
     start_point.x = 100;
     start_point.y = 0;
     end_point.x = 0;
     end_point.y = 100;
     lines.push_back(make_pair(start_point, end_point));
 
+    // | up
     start_point.x = 50;
     start_point.y = 0;
     end_point.x = 50;
     end_point.y = 50;
     lines.push_back(make_pair(start_point, end_point));
 
+    // - right
     start_point.x = 100;
     start_point.y = 50;
     end_point.x = 50;
     end_point.y = 50;
     lines.push_back(make_pair(start_point, end_point));
     
+    // | down
     start_point.x = 50;
     start_point.y = 100;
     end_point.x = 50;
     end_point.y = 50;
     lines.push_back(make_pair(start_point, end_point));
 
+    // - left
     start_point.x = 0;
     start_point.y = 50;
     end_point.x = 50;
     end_point.y = 50;
     lines.push_back(make_pair(start_point, end_point));
 
+    /* \ up */
     start_point.x = 0;
     start_point.y = 0;
     end_point.x = 50;
     end_point.y = 50;
     lines.push_back(make_pair(start_point, end_point));
 
+    /* / up */
     start_point.x = 100;
     start_point.y = 0;
     end_point.x = 50;
     end_point.y = 50;
     lines.push_back(make_pair(start_point, end_point));
 
+    /* \ down */
     start_point.x = 100;
     start_point.y = 100;
     end_point.x = 50;
     end_point.y = 50;
     lines.push_back(make_pair(start_point, end_point));
 
+    /* / down */
     start_point.x = 0;
     start_point.y = 100;
     end_point.x = 50;
@@ -407,7 +420,7 @@ uint16_t ARTagDetector::decoding(const cv::Mat& img, const vector<Point2f>& corn
         // moveWindow("and_mat", 400, 1100);
         // cout << "Non zero count: " << non_zero_count << endl;
         // cout << "length: " << length << endl;
-        waitKey(0);
+        // waitKey(0);
     }
 
     return code;

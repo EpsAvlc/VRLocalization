@@ -6,11 +6,22 @@
  *
  * Author: EpsAvlc
  */
+#ifndef AR_TAG_H__
+#define AR_TAG_H__
+#include <opencv2/core/core.hpp>
+#include <vector>
+#include <bitset>
 
 class ARTag
 {
 public:
-    uint16_t & code() {return code_;}
+    ARTag(uint16_t code) : code_(code){};
+    void UpdateLocation(uint16_t code, std::vector<cv::Point2f>& corners);
 private:
-    uint16_t & code_;
+    void rotate90Clockwise(uint16_t& code, std::vector<cv::Point2f>& corners);
+    std::bitset<16> code_;
+    std::vector<cv::Point2f> corners_;
+    bool updated_ = false;
 };
+
+#endif
